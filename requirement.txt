@@ -1,0 +1,4 @@
+- Python
+- pyttsx3 / gTTS (Text to Speech)
+- speech_recognition (optional for listening)
+- datetime, random
