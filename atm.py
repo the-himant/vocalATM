@@ -1,10 +1,11 @@
+import asyncio
 from gtts import gTTS
 from googletrans import Translator
 import random as r
 import datetime as dt
 import speech_recognition as sr
 import pyttsx3
-import playsound as ps
+import playsound3 as ps
 import os 
 
 engine = pyttsx3.init("sapi5")
@@ -26,23 +27,31 @@ pref_lang = 'en'
 # -----------------------
 class Speak_Lang():
     def __init__(self):
-        global pref_lang
 
         self.lang = pref_lang
         self.translator = Translator()
 
     def speak_lang(self,text):
         if self.lang != "en":
-            translated = self.translator.translate(text=text,dest=self.lang)
-            translated_text = translated.text
+            try:
+                result = asyncio.run(self.translator.translate(text, dest=self.lang))
+                translated_text = result.text
+            except Exception as e:
+                print('Error occur in translation.',e)
+                translated_text = text
             
 
         else: translated_text = text
-        tts =gTTS(translated_text,lang=self.lang)
-        filename = "voice.mp3"
-        tts.save(filename)
-        ps.playsound(filename)
-        os.remove(filename)
+        try:
+            tts =gTTS(translated_text,lang=self.lang)
+            filename = "voice.mp3"
+            tts.save(filename)
+            ps.playsound(filename)
+        except Exception as e:
+            print(f"Audio playback/TTS error: {e}")
+
+        finally:
+            os.remove(filename)
 # 
 
 def show_show_options():
@@ -78,7 +87,7 @@ def is_correct_option_int_input(user_choice,start=1,end=6):
         if start <= user_int_choice <= end:
             return user_int_choice
         else:
-            sl.speak_lang("Please select option from 1 to 6")
+            s1.speak_lang("Please select option from 1 to 6")
             print("Please select option from 1 to 6")
             return show_show_options()
     
